@@ -17,7 +17,7 @@ describe LetterPositionBlockBuilder do
     block.letters_positions[0].should == [-1]
   end
 
-  it "creates LetterPositionBlock based on each candidate" do
+  it "creates LetterPositionBlock for all candidates" do
     candidates = ["abdc", "aabbcd"]
     subject.create_letter_position_block_for_all_candidates("abc", candidates)
     block1 = subject.get_letter_position_block_for_candidate("abdc")
