@@ -4,10 +4,10 @@ require_relative "../lib/letter_position_block"
 describe SearchSuggester do
   let(:suggester) { SearchSuggester.new([]) }
 
-  it "gets the next closest position to current position" do
+  it "gets the next closest position to last picked position" do
     positions = [1, 2, 3]
-    current_position = 0
-    suggester.get_next_closest_position(positions, current_position).should == 1
+    current_position = 1
+    suggester.get_next_closest_position(positions, current_position).should == 2
   end
 
   it "returns current position if there's no bigger position" do
@@ -23,6 +23,13 @@ describe SearchSuggester do
     ordered.should == [2, 3, 4]
   end
 
+  it "deletes all -1 from the ordered positions" do
+    all_positions = [[-1], [2, 3], [3]]
+    ordered = suggester.create_ordered_positions(all_positions, 0)
+
+    ordered.should_not include(-1)
+  end
+
   it "returns collection of ordered positions" do
     collection_of_positions = [[2], [3], [0, 1], [4]]
     ordered = suggester.create_collection_of_ordered_positions(collection_of_positions)
@@ -30,22 +37,20 @@ describe SearchSuggester do
     ordered.should == [[2, 3, 4], [3, 4], [0, 4], [4]]
   end
 
-  it "gets all ordered char positions for a candidate" do
+  it "gets all ordered letter positions for a candidate" do
     candidates = ["mmsai"]
-    builder = LetterPositionBlockBuilder.new
-    builder.create_letter_position_block_for_all_candidates("sami", candidates)
+    builder = prepare_builder_for_word_and_candidates("sami", candidates)
     suggester = SearchSuggester.new(candidates, builder)
 
-    ordered1 = suggester.get_collection_of_ordered_positions_for_candidate(candidates[0])
+    ordered = suggester.get_collection_of_ordered_positions_for_candidate(candidates[0])
 
-    ordered1.should == [[2, 3, 4], [3, 4], [0, 4], [4]]
+    ordered.should == [[2, 3, 4], [3, 4], [0, 4], [4]]
   end
 
   it "creates a hash for each candidate and its longest ordered positions" do
     word = "remimance"
     candidates = ["remembrance", "reminiscence"]
-    builder = LetterPositionBlockBuilder.new
-    builder.create_letter_position_block_for_all_candidates(word, candidates)
+    builder = prepare_builder_for_word_and_candidates(word, candidates)
     suggester = SearchSuggester.new(candidates, builder)
 
     longest_positions = suggester.get_candidates_longest_ordered_positions
@@ -54,13 +59,17 @@ describe SearchSuggester do
     longest_positions[:reminiscence].should == 7
   end
 
-  it "returns the candidate with longest common chars in the same order as the searched word" do
-
-    word = "remimance"
+  it "returns the candidate with most common letters in the same order as the searched word" do 
     candidates = ["remembrance", "reminiscence"]
     suggester = SearchSuggester.new(candidates)
-    suggestion = suggester.suggest_for(word)
+    suggestion = suggester.suggest_for("remimance")
 
     suggestion.should == candidates[0]
+  end
+
+  def prepare_builder_for_word_and_candidates(word, candidates)
+    builder = LetterPositionBlockBuilder.new
+    builder.create_letter_position_block_for_all_candidates(word, candidates)
+    builder
   end
 end
