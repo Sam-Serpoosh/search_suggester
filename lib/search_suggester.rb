@@ -58,6 +58,7 @@ class SearchSuggester
       current_position = new_position
       index += 1
     end
+    ordered_positions.delete(-1)
     ordered_positions
   end
 
