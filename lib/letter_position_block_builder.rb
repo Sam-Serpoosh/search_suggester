@@ -16,7 +16,7 @@ class LetterPositionBlockBuilder
     char_index = 0
     word.each_char do |ch|
       positions = possible_positions_for_char_in_candidate(candidate, ch)
-      positions.each { |pos| block.set_position_for_letter(char_index, pos) }
+      positions.each { |pos| block.add_position_for_letter(char_index, pos) }
       char_index += 1
     end
 

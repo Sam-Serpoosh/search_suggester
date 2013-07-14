@@ -30,7 +30,7 @@ class SearchSuggester
   def get_collection_of_ordered_positions_for_candidate(candidate)
     block = @builder.get_letter_position_block_for_candidate(candidate)
     collection_of_positions = []
-    block.letter_positions.each do |letter, positions|
+    block.letters_positions.each do |letter, positions|
       collection_of_positions << positions
     end
 
